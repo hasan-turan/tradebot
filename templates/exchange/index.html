@@ -1,0 +1,13 @@
+ {% extends 'base.html'%}
+ {% block title%}Exchanges-Home{%endblock%}
+ {% block body%}
+
+ {% for exchange in exchanges %}
+ <div>
+     {#<a href="{% url 'detail' id=exchange.id %}"> {{exchange.title}}</a> #}
+     <a href="{{exchange.get_detail_url}}"> {{exchange.title}}</a>
+     <span>{{exchange.url}}</span>
+     <a href="{{ exchange.get_update_url}}">Update</a>
+ </div>
+ {% endfor %}
+ {% endblock %}

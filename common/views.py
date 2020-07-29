@@ -4,4 +4,7 @@ from django.shortcuts import render, HttpResponse
 
 
 def home_view(request):
-    return render(request, 'home.html')
+    context = {
+        'message': 'This is a message sent from view to template'
+    }
+    return render(request, 'home.html', context)
