@@ -1,0 +1,37 @@
+
+git commands:
+	git remote add origin https://github.com/hasan-turan/tradebot.git
+	git commit -m “Initial check in”
+	git push origin master
+
+
+create virtual env: python -m venv path\env-name
+activate virtual env: path\env-name\Scripts\activate.bat
+install django in virtual env: pip install django
+
+create django project: django-admin startproject pathto-folder(x) . (. for creating project in x folder)
+
+run server on virtual env: python manage.py runserver portnumber
+
+settings.py içinde installed_apps altındaki uygulamalar için gerekli olan veritabanı bilgilerinin oluşturulması için :python manage.py migrate
+
+create dbsuperuser: python manage.py createsuperuser
+----> dbusername: hasan
+----> pass: 1
+
+
+start app: python manage.py startapp appname
+
+
+to change html files under templates to django html istall 
+https://marketplace.visualstudio.com/items?itemName=batisteo.vscode-django extension 
+and add 
+"files.associations": {
+    "**/*.html": "html",
+    "**/templates/**/*.html": "django-html",
+    "**/templates/**/*": "django-txt",
+    "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+}, to settings.json file
+
+
+

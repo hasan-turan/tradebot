@@ -1,5 +1,6 @@
 from django.db import models
 import datetime
+from django.urls import reverse
 # Create your models here.
 
 # Create your models here.
@@ -14,3 +15,18 @@ class Exchange(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_detail_url(self):
+        # return "/exchange/{}".format(self.id)
+        # burada belirtilen exchange: urls.py içindeki app_name depişkenini refere eder
+        return reverse(viewname='exchange:detail', kwargs={'id': self.id})
+
+    def get_index_url(self):
+        # return "/exchange/{}".format(self.id)
+        # burada belirtilen exchange: urls.py içindeki app_name depişkenini refere eder
+        return reverse(viewname='exchange:index')
+
+    def get_update_url(self):
+        # return "/exchange/{}".format(self.id)
+        # burada belirtilen exchange: urls.py içindeki app_name depişkenini refere eder
+        return reverse(viewname='exchange:update', kwargs={'id': self.id})
