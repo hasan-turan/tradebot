@@ -30,3 +30,8 @@ class Exchange(models.Model):
         # return "/exchange/{}".format(self.id)
         # burada belirtilen exchange: urls.py içindeki app_name depişkenini refere eder
         return reverse(viewname='exchange:update', kwargs={'id': self.id})
+
+    def get_delete_url(self):
+        # return "/exchange/{}".format(self.id)
+        # burada belirtilen exchange: urls.py içindeki app_name depişkenini refere eder
+        return reverse(viewname='exchange:delete', kwargs={'id': self.id})

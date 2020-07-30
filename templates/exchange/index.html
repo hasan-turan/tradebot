@@ -2,12 +2,39 @@
  {% block title%}Exchanges-Home{%endblock%}
  {% block body%}
 
- {% for exchange in exchanges %}
- <div>
-     {#<a href="{% url 'detail' id=exchange.id %}"> {{exchange.title}}</a> #}
-     <a href="{{exchange.get_detail_url}}"> {{exchange.title}}</a>
-     <span>{{exchange.url}}</span>
-     <a href="{{ exchange.get_update_url}}">Update</a>
+
+ <div class="row justify-content-end margin-bottom-10 align-right">
+     <div class="col-2">
+         <a class="btn btn-sm btn-primary" href="{% url 'exchange:create' %}">Add New</a>
+     </div>
  </div>
- {% endfor %}
+
+ <div class=" table-responsive">
+     <table class="table">
+         <thead>
+             <tr>
+                 <th scope="col row-number-col">#</th>
+                 <th scope="col command-col"></th>
+                 <th scope="col">Title</th>
+                 <th scope="col">Url</th>
+                 <th scope="col">Date</th>
+             </tr>
+         </thead>
+         <tbody>
+             {% for exchange in exchanges %}
+             <tr>
+
+                 <td> {{ forloop.counter }}</td>
+                 <td>
+                     <a class="btn btn-sm btn-info" href="{{ exchange.get_detail_url}}">Detail</a>
+                     <a class="btn btn-sm btn-primary" href="{{ exchange.get_update_url}}">Update</a>
+                     <a class="btn btn-sm btn-danger" href="{{ exchange.get_delete_url}}">Delete</a></td>
+                 <td>{{exchange.title}}</td>
+                 <td>{{exchange.url|truncatechars:25 }}</td>
+                 <td>{{exchange.date|timesince}} before</td>
+             </tr>
+             {% endfor %}
+         </tbody>
+     </table>
+ </div>
  {% endblock %}

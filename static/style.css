@@ -1,3 +1,16 @@
-body {
-    background-color: red;
-}
+ .navbar-fixed-top {
+     margin-bottom: 40px;
+ }
+
+ .row-number-col,
+ .command-col {
+     max-width: 15px !important;
+ }
+
+ .margin-bottom-10 {
+     margin-bottom: 10px;
+ }
+
+ .align-right {
+     text-align: right !important;
+ }

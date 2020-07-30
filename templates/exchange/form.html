@@ -2,11 +2,19 @@
  {% block title%}Exchanges-Create{%endblock%}
  {% block body%}
 
- <form method="POST">
-     {% csrf_token %}
-     <h1>Form </h1>
-     {# formdaki bütün alanları p tagi ile kaplar #}
-     {{form.as_p}}
-     <input type="submit" value="Kaydet" />
- </form>
- {% endblock %}
+ {% load crispy_forms_tags %}
+ <div class="container">
+     <div class="row">
+         <div class="col-md-6 offset-md-3">
+             <form method="POST">
+                 {% csrf_token %}
+                 <h1>Form </h1>
+                 {# formdaki bütün alanları p tagi ile kaplar #}
+                 {{form|crispy}}
+                 <input class="btn btn-primary" type="submit" value="Save" />
+             </form>
+         </div>
+     </div>
+
+     {% endblock %}
+ </div>

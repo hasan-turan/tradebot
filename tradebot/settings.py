@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Django Apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,8 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # 3 party apps
+    'crispy_forms',
 
+    # Dev apps
     'exchange',
+
 
 ]
 
@@ -128,3 +133,5 @@ STATICFILES_DIRS = [
 # python manage.py collectstatic
 # this is for accessing static files on live server
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

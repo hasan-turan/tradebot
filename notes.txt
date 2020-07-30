@@ -1,9 +1,15 @@
 NumPy, Pandas, MathPlotLib, Quandl Python API, Quantopian(online platform)
 
+for uploading files : https://www.youtube.com/watch?v=JU8OKC1FqfQ&list=PLPrHLaayVkhny4WRNp05C1qRl1Aq3Wswh&index=29
+
 git commands:
 	git remote add origin https://github.com/hasan-turan/tradebot.git
-	git commit -m “Initial check in”
+	git  config --global user.name "Username"
+    git  config --global user.email email
+    git  add folder/file
+    git commit -m “Initial check in”
 	git push origin master
+
 
 
 create virtual env: python -m venv path\env-name
