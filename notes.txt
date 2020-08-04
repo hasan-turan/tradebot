@@ -42,3 +42,8 @@ and add
 
 
 
+Medium:
+https://medium.com/@MattGosden/tradingbot-series-architecture-for-a-trading-bot-ac2352508c82
+Backtrader:
+https://www.backtrader.com/docu/quickstart/quickstart/
+
