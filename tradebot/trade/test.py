@@ -62,3 +62,6 @@ cerebro.run()
 
 # Print out the final result
 print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+
+# Plot the result
+cerebro.plot()
