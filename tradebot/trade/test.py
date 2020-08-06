@@ -2,16 +2,20 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import datetime  # For datetime objects
+
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
 
 # Import the backtrader platform
 import backtrader as bt
+
 #from strategies.teststrategy import TestStrategy
 from strategies.sma import Sma
 
+from matplotlib import warnings
+
 params = {
-    'cash': 1000.0,
+    'cash': 100000.0,
     'commision': 0.0,
     'stake': 10,
 }

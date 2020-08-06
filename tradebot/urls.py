@@ -21,5 +21,5 @@ urlpatterns = [
     path('', home_view, name="home"),
     path('admin/', admin.site.urls, name="admin"),
     path('exchange/', include('exchange.urls')),
-
+    path('bokehx/', include('bokehx.urls')),
 ]

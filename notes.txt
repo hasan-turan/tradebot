@@ -12,15 +12,24 @@ git commands:
 
 
 
-create virtual env: python -m venv path\env-name
-activate virtual env: path\env-name\Scripts\activate.bat
-install django in virtual env: pip install django
+create virtual env: 
+    python -m venv path\env-name
+activate virtual env: 
+    path\env-name\Scripts\activate.bat
+install django in virtual env: 
+    pip install django
 
-create django project: django-admin startproject pathto-folder(x) . (. for creating project in x folder)
+create django project: 
+    django-admin startproject pathto-folder(x) . (. for creating project in x folder)
 
-run server on virtual env: python manage.py runserver portnumber
+run server on virtual env: 
+    python manage.py runserver portnumber
 
-settings.py içinde installed_apps altındaki uygulamalar için gerekli olan veritabanı bilgilerinin oluşturulması için :python manage.py migrate
+settings.py içinde installed_apps altındaki uygulamalar için gerekli olan veritabanı bilgilerinin oluşturulması için :
+    python manage.py migrate
+
+run server:
+    python manage.py runserver
 
 create dbsuperuser: python manage.py createsuperuser
 ----> dbusername: hasan
@@ -47,3 +56,8 @@ https://medium.com/@MattGosden/tradingbot-series-architecture-for-a-trading-bot-
 Backtrader:
 https://www.backtrader.com/docu/quickstart/quickstart/
 
+
+
+Bokeh Plotting 
+https://towardsdatascience.com/visualizing-the-stock-market-with-python-bokeh-d40d9d1f288e
+https://dev.to/kolawole39/visualizing-financial-market-data-with-django-bokeh-alphavantage-api-5gj2

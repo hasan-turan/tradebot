@@ -44,7 +44,7 @@ INSTALLED_APPS = [
 
     # Dev apps
     'exchange',
-
+    'bokehx',
 
 ]
 
