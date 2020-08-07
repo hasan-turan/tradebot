@@ -61,3 +61,7 @@ https://www.backtrader.com/docu/quickstart/quickstart/
 Bokeh Plotting 
 https://towardsdatascience.com/visualizing-the-stock-market-with-python-bokeh-d40d9d1f288e
 https://dev.to/kolawole39/visualizing-financial-market-data-with-django-bokeh-alphavantage-api-5gj2
+
+
+bokeh notes.
+http://docs.bokeh.org/en/latest/
