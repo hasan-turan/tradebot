@@ -40,37 +40,38 @@ def bokeh_index(request):
     #     ("Close", "@close"),
     #     ("Volume", "@volume")
     # ])
-    hover = HoverTool(tooltips=[
+    TOOLTIPS = [
         ("Date", "@date"),
         ("Open", "@open"),
         ("High", "@high"),
-        ("Low", "@low"),
+        ("Low", "$low"),
         ("Close", "@close"),
         ("Volume", "@volume")
-    ])
-    price_plot = figure(x_axis_type="datetime", tools=[SaveTool(), WheelPanTool(), WheelZoomTool(), BoxZoomTool(), ResetTool()],
-                        plot_width=1000, plot_height=500, title=title)
+    ]
 
-    price_plot.add_tools(HoverTool(
-        tooltips=[
-            ('date',   '@date{%F}'),
-            ('open',   '$@open{%0.2f}'),
-            ('high',   '$@high{%0.2f}'),
-            ('low',    '$@low{%0.2f}'),
-            # use @{ } for field names with spaces
-            ('close',  '$@{adj close}{%0.2f}'),
-            ('volume', '@volume{0.00 a}'),
-        ],
+    price_plot = figure(x_axis_type="datetime",
+                        plot_width=1000, plot_height=500, title=title, tooltips=TOOLTIPS)  # tools=[SaveTool(), WheelPanTool(), WheelZoomTool(), BoxZoomTool(), ResetTool()],
 
-        formatters={
-            'date': 'datetime',  # use 'datetime' formatter for 'date' field
-            'close': 'printf',   # use 'printf' formatter for 'close' field
-            # use default 'numeral' formatter for other fields
-        },
+    # price_plot.add_tools(HoverTool(
+    #     tooltips=[
+    #         ('date',   '@date{%F}'),
+    #         ('open',   '$@open{%0.2f}'),
+    #         ('high',   '$@high{%0.2f}'),
+    #         ('low',    '$@low{%0.2f}'),
+    #         # use @{ } for field names with spaces
+    #         ('close',  '$@{adj close}{%0.2f}'),
+    #         ('volume', '@volume{0.00 a}'),
+    #     ],
 
-        # display a tooltip whenever the cursor is vertically in line with a glyph
-        mode='vline'
-    ))
+    #     formatters={
+    #         'date': 'datetime',  # use 'datetime' formatter for 'date' field
+    #         'close': 'printf',   # use 'printf' formatter for 'close' field
+    #         # use default 'numeral' formatter for other fields
+    #     },
+
+    #     # display a tooltip whenever the cursor is vertically in line with a glyph
+    #     mode='vline'
+    # ))
 
     price_plot.background_fill_color = "#f5f5f5"
     price_plot.grid.grid_line_color = "white"
@@ -91,6 +92,6 @@ def bokeh_index(request):
 
     script, div = components(price_plot)
     # show(price_plot) #opens browser and shows plot in browser
-    #curdoc().add_periodic_callback(update_data, 1000)
+    # curdoc().add_periodic_callback(update_data, 1000)
 
     return render(request, 'bokeh/index.html', {'script': script, 'div': div, 'bokehversion': bokeh.__version__})
