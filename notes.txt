@@ -65,3 +65,4 @@ https://dev.to/kolawole39/visualizing-financial-market-data-with-django-bokeh-al
 
 bokeh notes.
 http://docs.bokeh.org/en/latest/
+https://docs.bokeh.org/en/latest/docs/user_guide/tools.html
