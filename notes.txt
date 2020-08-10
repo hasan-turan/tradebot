@@ -75,3 +75,6 @@ https://docs.bokeh.org/en/latest/docs/user_guide/tools.html
 bokeh   
     bokeh serve --allow-websocket-origin=127.0.0.1:8000 --log-level trace .\bokeh_server.py
     bokeh serve bokeh_server.py --allow-websocket-origin="*" --log-level trace
+
+binance integration
+    https://algotrading101.com/learn/binance-python-api-guide/
