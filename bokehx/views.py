@@ -20,6 +20,7 @@ from bokeh.embed import server_session
 from bokeh.util import session_id
 
 
+
 def bokeh_client(request):
     bokehServerUrl = 'http://localhost:5006/bokeh_server'
 
