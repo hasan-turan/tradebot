@@ -8,4 +8,5 @@ from . import views
 app_name = "bokehx"
 urlpatterns = [
     path('', views.bokeh_index, name='index'),
+    path('client/', views.bokeh_client, name='client'),
 ]

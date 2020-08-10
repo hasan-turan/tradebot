@@ -14,6 +14,25 @@ from .utils import get_data, convert_to_df, update_data
 from .enums import ApiFunction, ApiInterval
 
 
+from django.http import HttpResponse
+from bokeh.client import pull_session
+from bokeh.embed import server_session
+from bokeh.util import session_id
+
+
+def bokeh_client(request):
+    bokehServerUrl = 'http://localhost:5006/bokeh_server'
+
+    script = server_session(model=None,
+                            session_id=session_id.generate_session_id(),
+                            url=bokehServerUrl,
+                            )
+    context = {
+        'script': script
+    }
+    return render(request, template_name='bokeh/client.html', context=context)
+
+
 def bokeh_index(request):
     interval = ApiInterval.Min60
     apifunc = ApiFunction.DAILY
@@ -22,7 +41,6 @@ def bokeh_index(request):
 
     source = convert_to_df(result)
 
-    print("-------------------->source:{}".format(source))
     increasing = source.close > source.open
     decreasing = source.open > source.close
     # w = 12*60*60*1000 # half day in ms

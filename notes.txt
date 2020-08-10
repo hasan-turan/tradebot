@@ -31,12 +31,15 @@ settings.py içinde installed_apps altındaki uygulamalar için gerekli olan ver
 run server:
     python manage.py runserver
 
+start app: 
+    python manage.py startapp appname
+
 create dbsuperuser: python manage.py createsuperuser
 ----> dbusername: hasan
 ----> pass: 1
 
 
-start app: python manage.py startapp appname
+
 
 
 to change html files under templates to django html istall 
@@ -66,3 +69,9 @@ https://dev.to/kolawole39/visualizing-financial-market-data-with-django-bokeh-al
 bokeh notes.
 http://docs.bokeh.org/en/latest/
 https://docs.bokeh.org/en/latest/docs/user_guide/tools.html
+
+
+
+bokeh   
+    bokeh serve --allow-websocket-origin=127.0.0.1:8000 --log-level trace .\bokeh_server.py
+    bokeh serve bokeh_server.py --allow-websocket-origin="*" --log-level trace
