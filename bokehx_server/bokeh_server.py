@@ -13,7 +13,6 @@ import pandas as pd
 import requests
 from bokeh.models import ColumnDataSource
 
-
 class ApiFunction(Enum):
     INTRA_DAY = 1,
     DAILY = 2,
@@ -38,6 +37,7 @@ function = ApiFunction.INTRA_DAY
 # data = ColumnDataSource(dict(date=[], open=[], high=[], low=[], close=[]))
 source = ColumnDataSource(dict(date=[], open=[], high=[], low=[], close=[]))
 
+ 
 
 def get_Url(fromSymbol, toSymbol, apiKey, interval=ApiInterval.Min1, function=ApiFunction.INTRA_DAY):
     url = "https://www.alphavantage.co/query?function="

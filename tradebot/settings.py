@@ -45,12 +45,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3 party apps
-    'crispy_forms',
+    'crispy_forms', #pip install django-crispy-forms
 
     # Dev apps
     'exchange',
     'bokehx',
     'bokehx_server',
+    'ccxtx',
 
 ]
 

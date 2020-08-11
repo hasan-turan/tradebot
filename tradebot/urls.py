@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls, name="admin"),
     path('exchange/', include('exchange.urls')),
     path('bokehx/', include('bokehx.urls')),
+    path('ccxtx/', include('ccxtx.urls')),
 ]
