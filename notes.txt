@@ -76,10 +76,11 @@ bokeh
     bokeh serve --allow-websocket-origin=127.0.0.1:8000 --log-level trace .\bokeh_server.py
     bokeh serve bokeh_server.py --allow-websocket-origin="*" --log-level trace
 
-<<<<<<< HEAD
+ 
 binance integration
     https://algotrading101.com/learn/binance-python-api-guide/
-=======
+ 
 bokeh examples:
     https://docs.bokeh.org/en/latest/docs/gallery.html
->>>>>>> ba5b5a1d436f0cc7f946c4b8445dcbe8f2f36ce9
+    https://www.programcreek.com/python/example/106843/bokeh.models.HoverTool
+
