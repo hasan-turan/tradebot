@@ -5,14 +5,14 @@ from bokeh.models.widgets import Dropdown
 from bokeh.io import curdoc
 from bokeh.layouts import column
 
-from bokeh.models import BooleanFilter, CDSView, Select, Range1d, HoverTool,CrosshairTool
+from bokeh.models import BooleanFilter, CDSView, Select, Range1d, HoverTool
 from bokeh.palettes import Category20
 from bokeh.models.formatters import NumeralTickFormatter
-import ccxt
+
 # Define constants
 W_PLOT = 1500
 H_PLOT = 600
-TOOLS = 'pan,wheel_zoom,hover,reset,crosshair'
+TOOLS = 'pan,wheel_zoom,hover,reset'
 
 VBAR_WIDTH = 0.2
 RED = Category20[7][6]
@@ -24,28 +24,11 @@ BLUE_LIGHT = Category20[3][1]
 ORANGE = Category20[3][2]
 PURPLE = Category20[9][8]
 BROWN = Category20[11][10]
-binance = ccxt.binance()
-symbol = 'BTC/USDT'
-timeframe = '1h'
-datetime_format='%b %d %H:%M:%S'
-def get_symbol_df(exchange,symbol,timeframe):
-   
-    ohlcv= exchange.fetch_ohlcv(symbol,timeframe)
-    print("-----------------OHLCV----------")
-    print(ohlcv)
-    df = pd.DataFrame.from_records(data=ohlcv,  columns=[
-                                   "Date", "Open", "High", "Low", "Close", "Volume"])
-    print("-----------------df0----------")
-    print(df)
 
-    
-    # df.reset_index(inplace=True)
-    # print("-----------------df1----------")
-    # print(df)
-
-    df["Date"] = pd.to_datetime(df["Date"],unit='ms', origin='unix')
-    print("-----------------df after pd.to_datetime ----------")
-    print(df)
+def get_symbol_df(symbol=None):
+    df = pd.DataFrame(pd.read_csv('./bokehx_server/data/' + symbol + '.csv'))[-50:]
+    df.reset_index(inplace=True)
+    df["Date"] = pd.to_datetime(df["Date"])
     return df
 
 def plot_stock_price(stock):
@@ -60,7 +43,7 @@ def plot_stock_price(stock):
 
     # map dataframe indices to date strings and use as label overrides
     p.xaxis.major_label_overrides = {
-        i+int(stock.data['index'][0]): date.strftime(datetime_format) for i, date in enumerate(pd.to_datetime(stock.data["Date"]))
+        i+int(stock.data['index'][0]): date.strftime('%b %d') for i, date in enumerate(pd.to_datetime(stock.data["Date"]))
     }
     p.xaxis.bounds = (stock.data['index'][0], stock.data['index'][-1])
 
@@ -89,22 +72,19 @@ def plot_stock_price(stock):
     # Choose, which glyphs are active by glyph name
     price_hover.names = ["price"]
     # Creating tooltips
-    #("Datetime", "@Date{%Y-%m-%d}"),
-    price_hover.tooltips = [("Datetime", '@Date{%b %d %H:%M:%S}'),
+    price_hover.tooltips = [("Datetime", "@Date{%Y-%m-%d}"),
                             ("Open", "@Open{$0,0.00}"),
-                            ("High", "@High{$0,0.00}"),
-                            ("Low", "@Low{$0,0.00}"),
                             ("Close", "@Close{$0,0.00}"),
-                            ("Volume", "@Volume{($ 0.00 a)}")]
-    price_hover.formatters={"@Date": 'datetime'}
-    price_hover.mode='vline'
+                           ("Volume", "@Volume{($ 0.00 a)}")]
+    price_hover.formatters={"Date": 'datetime'}
+
     return p
 
   
 stock = ColumnDataSource(
     data=dict(Date=[], Open=[], Close=[], High=[], Low=[],index=[]))
- 
-df = get_symbol_df(binance,symbol,timeframe)
+symbol = 'msft'
+df = get_symbol_df(symbol)
 stock.data = stock.from_df(df)
 elements = list()
 
