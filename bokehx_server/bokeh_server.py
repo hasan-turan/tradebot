@@ -4,114 +4,65 @@ from bokeh.plotting import figure, ColumnDataSource
 from bokeh.models.widgets import Dropdown
 from bokeh.io import curdoc
 from bokeh.layouts import column
-
+import numpy as np
 from bokeh.models import BooleanFilter, CDSView, Select, Range1d, HoverTool,CrosshairTool
 from bokeh.palettes import Category20
 from bokeh.models.formatters import NumeralTickFormatter
 import ccxt
-# Define constants
-W_PLOT = 1500
-H_PLOT = 600
-TOOLS = 'pan,wheel_zoom,hover,reset,crosshair'
 
-VBAR_WIDTH = 0.2
-RED = Category20[7][6]
-GREEN = Category20[5][4]
-
-BLUE = Category20[3][0]
-BLUE_LIGHT = Category20[3][1]
-
-ORANGE = Category20[3][2]
-PURPLE = Category20[9][8]
-BROWN = Category20[11][10]
 binance = ccxt.binance()
 symbol = 'BTC/USDT'
 timeframe = '1h'
-datetime_format='%b %d %H:%M:%S'
-def get_symbol_df(exchange,symbol,timeframe):
-   
-    ohlcv= exchange.fetch_ohlcv(symbol,timeframe)
-    print("-----------------OHLCV----------")
-    print(ohlcv)
+
+def get_data(exchange, symbol, timeframe):
+    ohlcv = exchange.fetch_ohlcv(symbol, timeframe) 
     df = pd.DataFrame.from_records(data=ohlcv,  columns=[
-                                   "Date", "Open", "High", "Low", "Close", "Volume"])
-    print("-----------------df0----------")
-    print(df)
-
-    
-    # df.reset_index(inplace=True)
-    # print("-----------------df1----------")
-    # print(df)
-
-    df["Date"] = pd.to_datetime(df["Date"],unit='ms', origin='unix')
-    print("-----------------df after pd.to_datetime ----------")
-    print(df)
+                                   "date", "open", "high", "low", "close", "volume"])
+    df["date"] = pd.to_datetime(df["date"],unit='ms', origin='unix')
     return df
 
-def plot_stock_price(stock):
-   
-    p = figure(plot_width=W_PLOT, plot_height=H_PLOT, tools=TOOLS,
-               title="Stock price", toolbar_location='above')
-
-    inc = stock.data['Close'] > stock.data['Open']
-    dec = stock.data['Open'] > stock.data['Close']
-    view_inc = CDSView(source=stock, filters=[BooleanFilter(inc)])
-    view_dec = CDSView(source=stock, filters=[BooleanFilter(dec)])
-
-    # map dataframe indices to date strings and use as label overrides
-    p.xaxis.major_label_overrides = {
-        i+int(stock.data['index'][0]): date.strftime(datetime_format) for i, date in enumerate(pd.to_datetime(stock.data["Date"]))
-    }
-    p.xaxis.bounds = (stock.data['index'][0], stock.data['index'][-1])
+df=get_data(binance,symbol,timeframe)
+seqs=np.arange(df.shape[0])
+df["seq"]=pd.Series(seqs)
 
 
-    p.segment(x0='index', x1='index', y0='Low', y1='High', color=RED, source=stock, view=view_inc)
-    p.segment(x0='index', x1='index', y0='Low', y1='High', color=GREEN, source=stock, view=view_dec)
+df['date']=df['date'].apply(lambda x: x.strftime('%m/%d'))
 
-    p.vbar(x='index', width=VBAR_WIDTH, top='Open', bottom='Close', fill_color=BLUE, line_color=BLUE,
-           source=stock,view=view_inc, name="price")
-    p.vbar(x='index', width=VBAR_WIDTH, top='Open', bottom='Close', fill_color=RED, line_color=RED,
-           source=stock,view=view_dec, name="price")
 
-    p.legend.location = "top_left"
-    p.legend.border_line_alpha = 0
-    p.legend.background_fill_alpha = 0
-    p.legend.click_policy = "mute"
+df['mid']=df.apply(lambda x:(x['open']+x['close'])/2,axis=1)
+df['height']=df.apply(lambda x:abs(x['close']-x['open'] if x['close']!=x['open'] else 0.001),axis=1)
 
-    p.yaxis.formatter = NumeralTickFormatter(format='$ 0,0[.]000')
-    p.x_range.range_padding = 0.05
-    p.xaxis.ticker.desired_num_ticks = 40
-    p.xaxis.major_label_orientation = 3.14/4
-    
-    # Select specific tool for the plot
-    price_hover = p.select(dict(type=HoverTool))
+inc = df.close > df.open
+dec = df.open > df.close
+w=0.3
 
-    # Choose, which glyphs are active by glyph name
-    price_hover.names = ["price"]
-    # Creating tooltips
-    #("Datetime", "@Date{%Y-%m-%d}"),
-    price_hover.tooltips = [("Datetime", '@Date{%b %d %H:%M:%S}'),
-                            ("Open", "@Open{$0,0.00}"),
-                            ("High", "@High{$0,0.00}"),
-                            ("Low", "@Low{$0,0.00}"),
-                            ("Close", "@Close{$0,0.00}"),
-                            ("Volume", "@Volume{($ 0.00 a)}")]
-    price_hover.formatters={"@Date": 'datetime'}
-    price_hover.mode='vline'
-    return p
+#use ColumnDataSource to pass in data for tooltips
+sourceInc=ColumnDataSource(ColumnDataSource.from_df(df.loc[inc]))
+sourceDec=ColumnDataSource(ColumnDataSource.from_df(df.loc[dec]))
 
-  
-stock = ColumnDataSource(
-    data=dict(Date=[], Open=[], Close=[], High=[], Low=[],index=[]))
- 
-df = get_symbol_df(binance,symbol,timeframe)
-stock.data = stock.from_df(df)
-elements = list()
+#the values for the tooltip come from ColumnDataSource
+hover = HoverTool(
+    tooltips=[
+        ("date", "@date"),
+        ("open", "@open"),
+        ("close", "@close"),
+        ("percent", "@changepercent"),
+    ]
+)
 
-# update_plot()
-p_stock = plot_stock_price(stock)
+TOOLS = [CrosshairTool(), hover]
+p = figure(plot_width=1500, plot_height=600, tools=TOOLS,title = "aaa")
+p.xaxis.major_label_orientation = 3.14/4
+p.grid.grid_line_alpha=0.3
 
-elements.append(p_stock)
+#this is the up tail
+p.segment(df.seq[inc], df.high[inc], df.seq[inc], df.low[inc], color="red")
+#this is the bottom tail
+p.segment(df.seq[dec], df.high[dec], df.seq[dec], df.low[dec], color="green")
+#this is the candle body for the red dates
+p.rect(x='date', y='mid', width=w, height='height', fill_color="red", line_color="red", source=sourceInc)
+#this is the candle body for the green dates
+p.rect(x='date', y='mid', width=w, height='height', fill_color="green", line_color="green", source=sourceDec)
 
-curdoc().add_root(column(elements))
+curdoc().add_root(p)
 curdoc().title = 'Bokeh stocks historical prices'
