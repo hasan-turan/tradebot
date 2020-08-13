@@ -1,0 +1,6 @@
+django
+django-crispy-forms
+bokeh
+pandas
+requests
+ccxtnpm install ccxt

@@ -83,4 +83,6 @@ binance integration
 bokeh examples:
     https://docs.bokeh.org/en/latest/docs/gallery.html
     https://www.programcreek.com/python/example/106843/bokeh.models.HoverTool
+    https://github.com/bokeh/bokeh/blob/master/examples/app/stocks/main.py
+    https://stackoverflow.com/questions/39100095/how-to-capture-value-of-dropdown-widget-in-bokeh-python
 
