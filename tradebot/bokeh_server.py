@@ -9,14 +9,9 @@ from tradebot.utils.message_utils import show_info, show_error
 from bokeh.server.server import Server
 from bokeh.application import Application
 from bokeh.application.handlers.function import FunctionHandler
-
+import talib
 TOOLS = "pan,wheel_zoom,hover,reset,crosshair"
-binance = ccxt.binance()
-symbol = "BTC/USDT"
-timeframe = "4h"
 
-
-TITLE = "{} {} {}".format(timeframe, symbol, binance.name)
 
 print("*" * 80)
 print(
@@ -27,41 +22,72 @@ print(
 
 
 class BokehServer:
+
+    symbol = Select()
+    timeframe = Select()
+    exchange = None
+    source = source = ColumnDataSource(
+        data=dict(Date=[], Open=[], Close=[], High=[], Low=[], index=[])
+    )
+    title = ""
+
     def __init__(self):
 
-        pass
+        self.exchange = Exchange(ccxt.binance())
+        self.timeframe = self.create_timeframes()
+        self.symbol = self.create_symbols()
+        self.title = "{} {} {}".format(self.timeframe.value,
+                                       self.symbol.value, self.exchange.get_name())
 
-    def create_symbols(self, exchange):
-        symbols = exchange.get_symbols()
-        cmb_symbols = Select(title="Symbols", value="BTC/USDT", options=symbols)
+    def create_symbols(self):
+
+        symbols = self.exchange.get_symbols()
+        cmb_symbols = Select(
+            title="Symbols", value="BTC/USDT", options=symbols)
         return cmb_symbols
 
-    def create_time_frames(self, exchange):
-        time_frames = exchange.get_time_frames()
-        cmb_time_frames = Select(title="Time Frames", value="4h", options=time_frames)
+    def create_timeframes(self):
+
+        timeframes = self.exchange.get_timeframes()
+        cmb_time_frames = Select(
+            title="Time Frames", value="4h", options=timeframes)
         return cmb_time_frames
+
+    def symbol_change(self, attrname, old, new):
+        self.update_data()
+
+    def timeframe_change(self, attrname, old, new):
+        self.update_data()
+
+    def update_data(self):
+
+        print(self.symbol.value, self.timeframe.value)
+        df = self.exchange.get_data(self.symbol.value, self.timeframe.value)
+        self.source.data = self.source.from_df(df)
 
     def create_document(self, doc):
 
-        exchange = Exchange(binance)
-        show_info(" Exchange in bokeh_server:{}".format(exchange.get_name()))
+        show_info(" Exchange in bokeh_server:{}".format(
+            self.exchange.get_name()))
 
-        stock = ColumnDataSource(
-            data=dict(Date=[], Open=[], Close=[], High=[], Low=[], index=[])
-        )
+        df = self.exchange.get_data(self.symbol.value, self.timeframe.value)
+        if(df.empty):
+            show_info("Can not create document!- Data is not avaliable")
+            return
 
-        df = exchange.get_data(symbol, timeframe)
-        stock.data = stock.from_df(df)
+        self.source.data = self.source.from_df(df)
+        candleStickPlotter = CandleStickPlotter(self.title, 1500, 600, TOOLS)
+        p_stock = candleStickPlotter.plot(self.source)
 
-        candleStickPlotter = CandleStickPlotter(TITLE, 1500, 600, TOOLS)
-        p_stock = candleStickPlotter.plot(stock)
+        self.timeframe = self.create_timeframes()
+        self.timeframe.on_change('value', self.timeframe_change)
 
-        cmb_time_frame = self.create_time_frames(exchange)
-        cmb_symbols = self.create_symbols(exchange)
+        self.symbol = self.create_symbols()
+        self.symbol.on_change('value', self.symbol_change)
 
         # curdoc().add_root(column(elements))
         # curdoc().title = "Bokeh stocks historical prices"
-        toolbar = row(cmb_symbols, cmb_time_frame)
+        toolbar = row(self.symbol, self.timeframe)
         layout = column(toolbar, p_stock)
         doc.add_root(layout)
         doc.title = "Bokeh stocks historical prices"

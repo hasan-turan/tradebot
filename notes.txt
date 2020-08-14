@@ -85,4 +85,13 @@ bokeh examples:
     https://www.programcreek.com/python/example/106843/bokeh.models.HoverTool
     https://github.com/bokeh/bokeh/blob/master/examples/app/stocks/main.py
     https://stackoverflow.com/questions/39100095/how-to-capture-value-of-dropdown-widget-in-bokeh-python
+    https://programtalk.com/python-examples/bokeh.models.widgets.Select/
+
+indicators:
+    https://towardsdatascience.com/technical-analysis-library-to-financial-datasets-with-pandas-python-4b2b390d3543
+    https://www.thepythoncode.com/article/introduction-to-finance-and-technical-indicators-with-python
+TA_Lib
+    https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib
+    https://github.com/mrjbq7/ta-lib
+    Installation guide:https://blog.quantinsti.com/install-ta-lib-python/
 

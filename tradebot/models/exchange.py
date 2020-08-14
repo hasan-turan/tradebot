@@ -41,7 +41,7 @@ class Exchange:
         ):
             show_error(
                 "The requested timeframe ({}) is not available from {}\n".format(
-                    args.timeframe, args.exchange
+                    timeframe, self.exc.name
                 )
             )
             message = "Available timeframes are:\n"
@@ -72,30 +72,33 @@ class Exchange:
 
         return True
 
-    def get_time_frames(self):
-        time_frames = []
+    def get_timeframes(self):
+        keys = []
         for key in self.exc.timeframes.keys():
-            time_frames.append(key)
-        return time_frames
+            keys.append(key)
+        return keys
 
     def get_symbols(self):
-        symbols = []
-        for key in self.exc.symbols:
-            symbols.append(key)
-        return symbols
+        keys = []
+        if(self.exc.symbols != None):
+            for key in self.exc.symbols:
+                keys.append(key)
+        return keys
 
     def get_data(self, symbol, timeframe):
-        if not self.is_ohlcv_supported():
-            quit()
-
-        if not self.is_time_frame_avaliable(timeframe):
-            quit()
-
-        if not self.is_symbol_avaliable(symbol):
-            quit()
-
-        ohlcv = self.exc.fetch_ohlcv(symbol, timeframe)
+        ohlcv = []
         columns = ["Date", "Open", "High", "Low", "Close", "Volume"]
         df = pd.DataFrame(data=ohlcv, columns=columns)  # .set_index("Date")
+        if not self.is_ohlcv_supported():
+            return df
+
+        if not self.is_time_frame_avaliable(timeframe):
+            return df
+
+        if not self.is_symbol_avaliable(symbol):
+            return df
+
+        ohlcv = self.exc.fetch_ohlcv(symbol, timeframe)
+        df = pd.DataFrame(data=ohlcv, columns=columns)
         df["Date"] = pd.to_datetime(df["Date"], unit="ms", origin="unix")
         return df
