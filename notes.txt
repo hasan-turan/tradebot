@@ -14,8 +14,10 @@ git commands:
 
 create virtual env: 
     python -m venv path\env-name
+
 activate virtual env: 
     path\env-name\Scripts\activate.bat
+
 install django in virtual env: 
     pip install django
 

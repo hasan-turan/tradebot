@@ -85,7 +85,7 @@ class Exchange:
                 keys.append(key)
         return keys
 
-    def get_data(self, symbol, timeframe):
+    def get_data(self, symbol, timeframe, set_date_as_index=False):
         ohlcv = []
         columns = ["Date", "Open", "High", "Low", "Close", "Volume"]
         df = pd.DataFrame(data=ohlcv, columns=columns)  # .set_index("Date")
@@ -101,4 +101,10 @@ class Exchange:
         ohlcv = self.exc.fetch_ohlcv(symbol, timeframe)
         df = pd.DataFrame(data=ohlcv, columns=columns)
         df["Date"] = pd.to_datetime(df["Date"], unit="ms", origin="unix")
+        if(set_date_as_index):
+            df.set_index("Date", inplace=True)
+
+        print("-"*25)
+        print(df)
+
         return df

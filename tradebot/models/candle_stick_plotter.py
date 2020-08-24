@@ -13,8 +13,44 @@ DATETIME_FORMAT = "%b %d %H:%M:%S"
 
 
 class CandleStickPlotter(Plotter):
-    def plot(self, source):
-        p = figure(
+    def __init__(self, source, title, plot_width, plot_height, tools, time_frame, toolbar_location="above"):
+        super().__init__(title, plot_width, plot_height,
+                         tools, time_frame, toolbar_location)
+        self.p = None
+        self.source = source
+
+    def set_x_axis_labels(self, time_frame):
+        self.time_frame = time_frame
+        # p.xaxis.major_label_overrides = {
+        #     # i + int(source.data[x_axis][0]): date.strftime(DATETIME_FORMAT) for i, date in enumerate(pd.to_datetime(source.data["Date"]))
+        #     i: date.strftime(DATETIME_FORMAT) for i, date in enumerate(pd.to_datetime(source.data["Date"]))
+        # }
+        lablels = {}
+        for i, date in enumerate(pd.to_datetime(self.source.data["Date"])):
+            print(i)
+            lablels[i] = ""
+            print("{} {} ".format("*", self.time_frame[-1]))
+            if(self.time_frame.endswith("m")):
+                lablels[i] = date.strftime("%M")
+
+            elif(self.time_frame.endswith("h")):
+
+                lablels[i] = date.strftime("%H")
+
+            elif(self.time_frame.endswith("d")):
+                lablels[i] = date.strftime("%d")
+
+            elif(self.time_frame.endswith("w")):
+                lablels[i] = date.strftime("%d")
+
+            elif(self.time_frame.endswith("M")):
+                lablels[i] = date.strftime("%-m %B")
+
+        self.p.xaxis.major_label_overrides = lablels
+
+    def plot(self):
+
+        self.p = figure(
             plot_width=self.plot_width,
             plot_height=self.plot_height,
             tools=self.tools,
@@ -22,57 +58,57 @@ class CandleStickPlotter(Plotter):
             toolbar_location=self.toolbar_location,
         )
 
-        inc = source.data["Close"] > source.data["Open"]
-        dec = source.data["Open"] > source.data["Close"]
+        inc = self.source.data["Close"] > self.source.data["Open"]
+        dec = self.source.data["Open"] > self.source.data["Close"]
 
-        view_inc = CDSView(source=source, filters=[BooleanFilter(inc)])
-        view_dec = CDSView(source=source, filters=[BooleanFilter(dec)])
+        view_inc = CDSView(source=self.source, filters=[BooleanFilter(inc)])
+        view_dec = CDSView(source=self.source, filters=[BooleanFilter(dec)])
 
+        x_axis = "index"
         # map dataframe indices to date strings and use as label overrides
-        p.xaxis.major_label_overrides = {
-            i + int(source.data["index"][0]): date.strftime(DATETIME_FORMAT)
-            for i, date in enumerate(pd.to_datetime(source.data["Date"]))
-        }
-        p.xaxis.bounds = (source.data["index"][0], source.data["index"][-1])
 
-        p.segment(
-            x0="index",
-            x1="index",
+        self.set_x_axis_labels(self.time_frame)
+
+        self.p.xaxis.bounds = (
+            self.source.data[x_axis][0], self.source.data[x_axis][-1])
+        self.p.segment(
+            x0=x_axis,
+            x1=x_axis,
             y0="Low",
             y1="High",
             color=RED,
-            source=source,
+            source=self.source,
             view=view_inc,
         )
-        p.segment(
-            x0="index",
-            x1="index",
+        self.p.segment(
+            x0=x_axis,
+            x1=x_axis,
             y0="Low",
             y1="High",
             color=GREEN,
-            source=source,
+            source=self.source,
             view=view_dec,
         )
 
-        p.vbar(
-            x="index",
+        self.p.vbar(
+            x=x_axis,
             width=VBAR_WIDTH,
             top="Open",
             bottom="Close",
             fill_color=GREEN,
             line_color=GREEN,
-            source=source,
+            source=self.source,
             view=view_inc,
             name="price",
         )
-        p.vbar(
-            x="index",
+        self.p.vbar(
+            x=x_axis,
             width=VBAR_WIDTH,
             top="Open",
             bottom="Close",
             fill_color=RED,
             line_color=RED,
-            source=source,
+            source=self.source,
             view=view_dec,
             name="price",
         )
@@ -82,13 +118,13 @@ class CandleStickPlotter(Plotter):
         # p.legend.background_fill_alpha = 0
         # p.legend.click_policy = "mute"
 
-        p.yaxis.formatter = NumeralTickFormatter(format="$ 0,0[.]000")
-        p.x_range.range_padding = 0.05
-        p.xaxis.ticker.desired_num_ticks = 40
-        p.xaxis.major_label_orientation = 3.14 / 4
+        self.p.yaxis.formatter = NumeralTickFormatter(format="$ 0,0[.]000")
+        self.p.x_range.range_padding = 0.05
+        self.p.xaxis.ticker.desired_num_ticks = 40
+        self.p.xaxis.major_label_orientation = 3.14 / 4
 
         # Select specific tool for the plot
-        price_hover = p.select(dict(type=HoverTool))
+        price_hover = self.p.select(dict(type=HoverTool))
 
         # Choose, which glyphs are active by glyph name
         price_hover.names = ["price"]
@@ -104,5 +140,4 @@ class CandleStickPlotter(Plotter):
         ]
         price_hover.formatters = {"@Date": "datetime"}
         price_hover.mode = "vline"
-        return p
-
+        return self.p

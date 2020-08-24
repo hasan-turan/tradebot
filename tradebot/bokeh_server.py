@@ -2,8 +2,9 @@ from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, Dropdown, Select
 from .models.exchange import Exchange
-from .models.employee import Employee
+
 from .models.candle_stick_plotter import CandleStickPlotter
+
 import ccxt
 from tradebot.utils.message_utils import show_info, show_error
 from bokeh.server.server import Server
@@ -13,26 +14,19 @@ import talib
 TOOLS = "pan,wheel_zoom,hover,reset,crosshair"
 
 
-print("*" * 80)
-print(
-    "__file__={0:<35} | __name__={1:<20} | __package__={2:<20}".format(
-        __file__, __name__, str(__package__)
-    )
-)
-
-
 class BokehServer:
 
     symbol = Select()
     timeframe = Select()
     exchange = None
-    source = source = ColumnDataSource(
+    source = ColumnDataSource(
         data=dict(Date=[], Open=[], Close=[], High=[], Low=[], index=[])
     )
     title = ""
+    plotter = None
 
     def __init__(self):
-
+        self.progressing = False
         self.exchange = Exchange(ccxt.binance())
         self.timeframe = self.create_timeframes()
         self.symbol = self.create_symbols()
@@ -60,10 +54,18 @@ class BokehServer:
         self.update_data()
 
     def update_data(self):
+        if self.progressing:
+            show_info("Already in progress!")
+        else:
+            show_info("Updating data:{} {}".format(
+                self.symbol.value, self.timeframe.value))
+            self.progressing = True
+            df = self.exchange.get_data(
+                self.symbol.value, self.timeframe.value)
+            self.source.data.update(self.source.from_df(df))
+            self.progressing = False
 
-        print(self.symbol.value, self.timeframe.value)
-        df = self.exchange.get_data(self.symbol.value, self.timeframe.value)
-        self.source.data = self.source.from_df(df)
+            self.plotter.set_x_axis_labels(self.timeframe.value)
 
     def create_document(self, doc):
 
@@ -76,8 +78,10 @@ class BokehServer:
             return
 
         self.source.data = self.source.from_df(df)
-        candleStickPlotter = CandleStickPlotter(self.title, 1500, 600, TOOLS)
-        p_stock = candleStickPlotter.plot(self.source)
+
+        self.plotter = CandleStickPlotter(
+            self.source, self.title, 1500, 600, TOOLS, self.timeframe.value)
+        p_stock = self.plotter.plot()
 
         self.timeframe = self.create_timeframes()
         self.timeframe.on_change('value', self.timeframe_change)
@@ -89,8 +93,9 @@ class BokehServer:
         # curdoc().title = "Bokeh stocks historical prices"
         toolbar = row(self.symbol, self.timeframe)
         layout = column(toolbar, p_stock)
-        doc.add_root(layout)
         doc.title = "Bokeh stocks historical prices"
+        doc.add_periodic_callback(self.update_data, 10)
+        doc.add_root(layout)
 
     def run(self):
 
