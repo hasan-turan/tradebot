@@ -104,7 +104,7 @@ class Exchange:
         if(set_date_as_index):
             df.set_index("Date", inplace=True)
 
-        print("-"*25)
-        print(df)
+        # print("-"*25)
+        # print(df)
 
         return df

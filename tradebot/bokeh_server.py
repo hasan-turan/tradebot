@@ -4,6 +4,8 @@ from bokeh.models import ColumnDataSource, Dropdown, Select
 from .models.exchange import Exchange
 
 from .models.candle_stick_plotter import CandleStickPlotter
+from .models.ema import Ema
+
 
 import ccxt
 from tradebot.utils.message_utils import show_info, show_error
@@ -11,7 +13,7 @@ from bokeh.server.server import Server
 from bokeh.application import Application
 from bokeh.application.handlers.function import FunctionHandler
 import talib
-TOOLS = "pan,wheel_zoom,hover,reset,crosshair"
+tools = "pan,wheel_zoom,box_zoom,hover,reset,crosshair"
 
 
 class BokehServer:
@@ -28,10 +30,22 @@ class BokehServer:
     def __init__(self):
         self.progressing = False
         self.exchange = Exchange(ccxt.binance())
-        self.timeframe = self.create_timeframes()
-        self.symbol = self.create_symbols()
-        self.title = "{} {} {}".format(self.timeframe.value,
-                                       self.symbol.value, self.exchange.get_name())
+        self.cmb_timeframe = self.create_timeframes()
+        self.cmb_symbol = self.create_symbols()
+        self.title = "{} {} {}".format(self.cmb_timeframe.value,
+                                       self.cmb_symbol.value, self.exchange.get_name())
+        self.emas = []
+        ema9 = Ema(9, "green", 2)
+        self.emas.append(ema9)
+
+        ema21 = Ema(21, "brown", 2)
+        self.emas.append(ema21)
+
+        ema50 = Ema(50, "red", 2)
+        self.emas.append(ema50)
+
+        ema100 = Ema(100, "black", 2)
+        self.emas.append(ema100)
 
     def create_symbols(self):
 
@@ -47,51 +61,48 @@ class BokehServer:
             title="Time Frames", value="4h", options=timeframes)
         return cmb_time_frames
 
-    def symbol_change(self, attrname, old, new):
+    def cmb_symbol_change(self, attrname, old, new):
         self.update_data()
 
-    def timeframe_change(self, attrname, old, new):
+    def cmb_timeframe_change(self, attrname, old, new):
         self.update_data()
 
     def update_data(self):
-        if self.progressing:
-            show_info("Already in progress!")
-        else:
-            show_info("Updating data:{} {}".format(
-                self.symbol.value, self.timeframe.value))
-            self.progressing = True
-            df = self.exchange.get_data(
-                self.symbol.value, self.timeframe.value)
-            self.source.data.update(self.source.from_df(df))
-            self.progressing = False
 
-            self.plotter.set_x_axis_labels(self.timeframe.value)
+        df = self.exchange.get_data(
+            self.cmb_symbol.value, self.cmb_timeframe.value)
+        self.source.data.update(self.source.from_df(df))
+
+        self.plotter.plot(self.source,
+                          self.cmb_timeframe.value, self.emas)
 
     def create_document(self, doc):
 
         show_info(" Exchange in bokeh_server:{}".format(
             self.exchange.get_name()))
 
-        df = self.exchange.get_data(self.symbol.value, self.timeframe.value)
+        df = self.exchange.get_data(
+            self.cmb_symbol.value, self.cmb_timeframe.value)
         if(df.empty):
             show_info("Can not create document!- Data is not avaliable")
             return
 
         self.source.data = self.source.from_df(df)
 
-        self.plotter = CandleStickPlotter(
-            self.source, self.title, 1500, 600, TOOLS, self.timeframe.value)
-        p_stock = self.plotter.plot()
+        self.plotter = CandleStickPlotter(self.title, 1500, 600, tools)
 
-        self.timeframe = self.create_timeframes()
-        self.timeframe.on_change('value', self.timeframe_change)
+        p_stock = self.plotter.plot(
+            self.source, self.cmb_timeframe.value, emas=self.emas)
 
-        self.symbol = self.create_symbols()
-        self.symbol.on_change('value', self.symbol_change)
+        self.cmb_timeframe = self.create_timeframes()
+        self.cmb_timeframe.on_change('value', self.cmb_timeframe_change)
+
+        self.cmb_symbol = self.create_symbols()
+        self.cmb_symbol.on_change('value', self.cmb_symbol_change)
 
         # curdoc().add_root(column(elements))
         # curdoc().title = "Bokeh stocks historical prices"
-        toolbar = row(self.symbol, self.timeframe)
+        toolbar = row(self.cmb_symbol, self.cmb_timeframe)
         layout = column(toolbar, p_stock)
         doc.title = "Bokeh stocks historical prices"
         doc.add_periodic_callback(self.update_data, 10)
